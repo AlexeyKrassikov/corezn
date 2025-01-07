@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "corezn/api/proto";
+
+service Auth {
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+}
+
+message RegisterRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  string password = 4;
+  string vat_number = 5;
+  optional string company_name = 6;
+}
+
+message RegisterResponse {
+  string user_id = 1;
+  string message = 2;
+}

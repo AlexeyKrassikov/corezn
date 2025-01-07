@@ -8,6 +8,7 @@ import (
 
         pb "corezn/api/proto"
         "corezn/internal/config"
+        "corezn/internal/database"
         "corezn/internal/service"
 
         "google.golang.org/grpc"
@@ -22,12 +23,22 @@ func main() {
         // Load configuration
         cfg := config.LoadConfig()
 
+        // Initialize database
+        db, err := database.NewDatabase(cfg.DatabaseURL)
+        if err != nil {
+                log.Fatalf("Failed to initialize database: %v", err)
+                os.Exit(1)
+        }
+
         // Create a gRPC server
         grpcServer := grpc.NewServer()
 
         // Register our services
         healthCheckServer := service.NewHealthCheckServer(version)
         pb.RegisterHealthCheckServer(grpcServer, healthCheckServer)
+
+        authServer := service.NewAuthServer(db)
+        pb.RegisterAuthServer(grpcServer, authServer)
 
         // Register reflection service on gRPC server
         reflection.Register(grpcServer)
